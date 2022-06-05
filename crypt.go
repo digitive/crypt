@@ -1,6 +1,9 @@
 package crypt
 
-import "encoding/binary"
+import (
+	"encoding/binary"
+	"errors"
+)
 
 var (
 	conSalt = []uint32{0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
@@ -133,7 +136,16 @@ var (
 	}
 )
 
+var ErrInvalidSalt = errors.New("invalid salt")
+
+// Crypt generates a crypt(3) compatible hash using the DES algorithm.
+// original: plaintext password
+// salt: a two character string drawn from [a-zA-Z0-9./].
 func Crypt(original, salt string) (string, error) {
+	if err := checkSalt(salt); err != nil {
+		return "", err
+	}
+
 	buffer := make([]byte, 13)
 	charZero := byte(salt[0])
 	charOne := byte(salt[1])
@@ -175,6 +187,22 @@ func Crypt(original, salt string) (string, error) {
 		}
 	}
 	return string(buffer), nil
+}
+
+func checkSalt(salt string) error {
+	if len(salt) != 2 {
+		return ErrInvalidSalt
+	}
+
+	for i := 0; i < 2; i++ {
+		b := byte(salt[i])
+
+		if !(b >= 'a' && b <= 'z' || b >= 'A' && b <= 'Z' || b >= '0' && b <= '9' || b == '.' || b == '/') {
+			return ErrInvalidSalt
+		}
+	}
+
+	return nil
 }
 
 func desSetKey(key []byte) []uint32 {
