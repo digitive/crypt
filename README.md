@@ -1,4 +1,6 @@
 # crypt
+[![Build Status](https://app.travis-ci.com/digitive/crypt.svg?branch=main)](https://app.travis-ci.com/digitive/crypt.svg?branch=main)
+
 Pure go implementation of unix crypt(3). This package only implements the traditional 56 bit DES based algorithm. This implementation is ported mostly from the UnixCrypt.java from [Apache Commons Codec](https://commons.apache.org/proper/commons-codec/), with some modifications in order to follow golang conventions. 
 
 This package is go-routine (concurrent) safe.
